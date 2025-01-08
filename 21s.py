@@ -1,6 +1,4 @@
 from random import randint
-
-card_base = randint(1, 13)
 is_playing = 0 # This is the variable that determines if the game is being played or not
 chips = 20 # This is the amount of chips the player has
 bet_amount = 0  # This is the amount of chips the player is betting at a given time
@@ -10,20 +8,11 @@ def play():  # Defines the starting of a new round
     begin_input = input(f"Chips: {chips}. Would you like to begin a round? (y) ")
     if begin_input != "y":
         print("You didn't agree. Goodbye!")
-        is_playing = False
+        exit()
     else:
         is_playing = True
         print("Let's play!")
         game_loop()
-    
-def recieve_card():
-    card_base = randint(1, 13)
-    if 2 <= card_base <= 10:
-        return card_base
-    elif card_base == 1:
-        return 1  # Assuming Ace is 1
-    else:
-        return 10  # For J, Q, K
 
 def game_loop():  # This is the main game loop
     global is_playing
@@ -45,8 +34,12 @@ def game_loop():  # This is the main game loop
 
         draw_input = input("Press Enter to draw a card, press (e) to stand " )  # This is the input for drawing a card
         if draw_input == "":  # If the user presses Enter
-            card_value = (recieve_card())  # Calling the function to determine the value of the card (The  function is defined later)
-            cards_value += card_value
+            card_value = randint(1, 13)
+            if card_value == 1:
+                if cards_value + 11 <= 21:
+                    card_value = 11
+                else: card_value = 1
+            cards_value += card_value if card_value <= 10 else 10
             if 2 <= card_value <= 10:
                 print(f"Your card is a {card_value}. Total value: {cards_value}")
             elif card_value == 1:
@@ -61,7 +54,6 @@ def game_loop():  # This is the main game loop
             draw_input = 0
 
             if cards_value > 21:
-                chips -= bet_amount
                 print(f"You're Bust! The value of your cards is over 21. chips: {chips}")
                 is_playing = False
 
@@ -70,9 +62,15 @@ def game_loop():  # This is the main game loop
             print(f"Your final value is {cards_value}") # Prints the final value of the cards
             dealer_cards = 0
             while dealer_cards < 17:
-                dealer_card_value = (recieve_card())
-                dealer_cards += dealer_card_value
-                print(f"The dealer drew a card worth {dealer_card_value}. Total value: {dealer_cards}")
+                dealer_base = (randint(1, 13))
+                if dealer_base == 1:
+                    dealer_value = 11 if dealer_cards + 11 <= 21 else 1
+                elif dealer_base > 10: 
+                    dealer_value = 10
+                else:
+                    dealer_value = dealer_base
+                dealer_cards += dealer_value
+                print(f"The dealer drew a card worth {dealer_value}. Total value: {dealer_cards}")
             print(f"The dealer's final value is {dealer_cards}")
             if dealer_cards > 21:
                 chips += (bet_amount * 2)
