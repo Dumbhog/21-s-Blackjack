@@ -2,6 +2,7 @@ from random import randint
 is_playing = 0 # This is the variable that determines if the game is being played or not
 chips = 20 # This is the amount of chips the player has
 bet_amount = 0  # This is the amount of chips the player is betting at a given time
+cards_dealt = 0  # This is the amount of cards that have been dealt for the player
 
 def play():  # Defines the starting of a new round
     global is_playing
@@ -17,7 +18,7 @@ def play():  # Defines the starting of a new round
 def game_loop():  # This is the main game loop
     global is_playing
     global chips
-    global bet_amount
+    global cards_dealt
     cards_value = 0  # Defining the value of all cards added outside the loop
 
     bet_amount = int(input("How much would you like to bet? " ))  # This is the input for the bet amount
@@ -32,7 +33,7 @@ def game_loop():  # This is the main game loop
         
     while is_playing:
 
-        draw_input = input("Press Enter to draw a card, press (e) to stand " )  # This is the input for drawing a card
+        draw_input = input("'Enter' to draw a card, 'e' to stand, 'd' to double down. ")  # This is the input for drawing a card
         if draw_input == "":  # If the user presses Enter
             card_value = randint(1, 13)
             if card_value == 1:
@@ -51,15 +52,22 @@ def game_loop():  # This is the main game loop
             elif card_value == 13:
                 print(f"Your card is a Jack. Total value: {cards_value}")
 
-            draw_input = 0
+            cards_dealt += 1
 
             if cards_value > 21:
                 print(f"You're Bust! The value of your cards is over 21. chips: {chips}")
                 is_playing = False
 
+        elif draw_input == "d" and cards_dealt == 2:  # If the player types D
+            chips -= bet_amount
+            bet_amount *= 2
+            print(f"You've doubled down! Bet: {bet_amount} Chips: {chips}.") # Prints the new bet amount
+            cards_dealt += 1
 
-        elif draw_input == "e":  # If the player types E
+
+        elif draw_input == "e" and cards_dealt >= 2:  # If the player types E
             print(f"Your final value is {cards_value}") # Prints the final value of the cards
+            cards_dealt = 0
             dealer_cards = 0
             while dealer_cards < 17:
                 dealer_base = (randint(1, 13))
@@ -87,5 +95,15 @@ def game_loop():  # This is the main game loop
                 chips += bet_amount
                 print(f"Push! You both get your bet back. chips: {chips}")
                 is_playing = False
+
+        elif draw_input == "e" and not cards_dealt >= 2:
+            print("You can't stand until you've drawn at least two cards.")
+
+        elif draw_input == "d" and cards_dealt != 2:
+            print("You can only double down after you've drawn two cards.")
+        else:
+            print("that is not a valid input, please try again.")
+
+
 while True:
     play()
